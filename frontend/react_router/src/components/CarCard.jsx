@@ -8,8 +8,6 @@ export default function CarCard({id, name, brand, description, release_year, pri
         const state = {id, name, brand, description, release_year, price, is_rented, car_image}
     
    
-
-    // const mykey = 'AIzaSyA9IpqQtJ9epsewDfaJcRvOz2cPbaDyML8'
     const formatedPrice = new Intl.NumberFormat('en-IN', 
         {
             currency: 'USD', 
