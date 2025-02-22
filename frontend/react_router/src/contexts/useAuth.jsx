@@ -8,7 +8,7 @@ const AuthContext = createContext()
 export default function AuthProvider({children}){
 
     const [isAuthenticated, setIsAuthenticated] = useState(false)
-    const [currentUser, setCurrentUser] = useState('')
+    const [currentUser, setCurrentUser] = useState(null)
     const location = useLocation()
 
     useEffect(()=>{
@@ -20,9 +20,11 @@ export default function AuthProvider({children}){
                     const refreshed = await RefreshToken()
                     if (refreshed){
                         response = await isAuth()
+                        console.log({'refrehed': refreshed})
                     }
                 }
                 setIsAuthenticated(response)
+                console.log(isAuthenticated)
             }catch(error){
                 console.log(error)
                 setIsAuthenticated(false)
@@ -38,8 +40,9 @@ export default function AuthProvider({children}){
             try{
                 const response = await getUser()
                 setCurrentUser(response)
-                // console.log(currentUser)
+                console.log(currentUser)
             }catch{
+                console.log(currentUser)
                 setCurrentUser(null)
             }
         }
@@ -48,7 +51,7 @@ export default function AuthProvider({children}){
         !isAuthenticated && setCurrentUser(null)
     }, [isAuthenticated])
 
-    return <AuthContext.Provider value={{isAuthenticated, currentUser}}>
+    return <AuthContext.Provider value={{isAuthenticated, setIsAuthenticated, currentUser}}>
         {children}
     </AuthContext.Provider>
 

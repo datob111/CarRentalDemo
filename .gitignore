@@ -13,6 +13,9 @@ __pycache__/
 
 .env
 
+backend/car_rental_back/media/
+back/car_rental_back/db.sqlite3
+
 **/migrations/__pycache__/
 
 frontend/react_router/node_modules/

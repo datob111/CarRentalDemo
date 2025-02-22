@@ -15,6 +15,7 @@ import { useCar } from '../../contexts/useCar'
 import { DeleteReservation } from '../../endpoints/api'
 
 
+
 export default function ReservationForm1({carId}){
 	
 
@@ -35,6 +36,9 @@ export default function ReservationForm1({carId}){
 
 	const [reservationId, setReservationId] = useState(null)
 
+	const {isAuthenticated} = useAuth()
+	const {setIsAuthenticated} = useAuth()
+
 
 		const handlePickUp = (e)=>{
 			setPickUpDate(e.target.value)
@@ -54,17 +58,31 @@ export default function ReservationForm1({carId}){
 			try{
 				e.preventDefault()
 				let response = await CarReservation(carId, pickUpDate, dropOffDate, price)
-				
-				if (response.status != 201){
-					console.log(response)
-					// console.log(currentUser)
+
+				if (response.code == 'token_not_valid'){
 					const refreshed = await RefreshToken()
 					if (refreshed){
 						response = await CarReservation(carId, pickUpDate, dropOffDate, price)
+						console.log('refreshed')
+						setIsAuthenticated(true)
+					}else{
+						setIsAuthenticated(true)
 					}
+				}
+				
+				if (response.message !=null){
+					// console.log(response)
+					// // console.log(currentUser)
+					// const refreshed = await RefreshToken()
+					// if (refreshed){
+					// 	response = await CarReservation(carId, pickUpDate, dropOffDate, price)
+					// 	console.log('refreshed')
+					// }
+					// console.log(response)
 					setMessage(response.message)
 					setTimeout(()=>{setMessage(null)}, 4000)
-				}else{
+				}else
+				{
 					setMessage("You have successfully booked the car!")
 					setTimeout(()=>{setMessage(null)}, 4000)
 					const endTime = new Date(new Date(response.data.end_date).toISOString().slice(0, 16)).getTime()
@@ -77,6 +95,7 @@ export default function ReservationForm1({carId}){
 				}
 			}catch(error){
 				console.log({'error': error})
+				console.log(isAuthenticated)
 			}
 
 		}
@@ -95,6 +114,7 @@ export default function ReservationForm1({carId}){
 				}
 			}catch(error){
 				console.log(error) 
+				console.log(isAuthenticated)
 			}
 		}
 
@@ -129,6 +149,7 @@ export default function ReservationForm1({carId}){
 			const seconds = Number(((minutes- minutesF) * 60).toFixed(0))
 			// console.log(hoursF, minutesF, seconds)
 			console.log(timerLeft)
+			console.log(timer)
 
 			
 			

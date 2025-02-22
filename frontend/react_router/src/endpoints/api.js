@@ -15,6 +15,7 @@ const deleteReservationUrl = 'http://127.0.0.1:8000/reservations/'
 
 
 
+
 export async function Login(email, password){
     const response = await axios.post(loginUrl, {email:email, password:password}, {withCredentials:true})
     // document.cookie = `access_token=${response.data['access']}, refresh_token=${response.data['refresh']}`
@@ -111,15 +112,11 @@ export async function getUser() {
         const response = await axios.get(getUserUrl, {withCredentials:true})
         return response.data
     }catch(error){
-        try{
             await refreshTokenUrl()
-            console.log('refreshed')
-            await axios.get(getUserUrl, {withCredentials:true})
-        }catch(error){
-            console.log("no active user")
-        }
         console.log(error)
-        return false
+        console.log('otra noche, otra!!!')
+        const response = await axios.get(getUserUrl, {withCredentials:true})
+        return response.data
     }
 }
 
@@ -150,8 +147,9 @@ export async function getReservations(carPk) {
     }catch(error){
         await RefreshToken()
         console.log('refreshed')
-        await axios.get(getReservationsUrl + carPk + '/', {withCredentials:true})
-        return error.response.data
+        console.log(carPk)
+        return await axios.get(getReservationsUrl + carPk + '/', {withCredentials:true})
+        
     }
 }
 
