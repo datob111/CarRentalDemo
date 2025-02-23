@@ -18,21 +18,24 @@ import { DeleteReservation } from '../../endpoints/api'
 
 export default function ReservationForm1({carId}){
 	
-
+	const [currentTime, setCurrentTime] = useState(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
 	const [pickUpDate, setPickUpDate] = useState(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16))
 	const [dropOffDate, setDropOffDate] = useState(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16))
 
-	const [finalPickUpDate, setFinalPickUpDate] = useState(0)
-	const [finalDropOffDate, setFinalDropOffDate] = useState(0)
+	// const [finalPickUpDate, setFinalPickUpDate] = useState(0)
+	// const [finalDropOffDate, setFinalDropOffDate] = useState(0)
 
-	const {currentUser} = useAuth()
+	// const {currentUser} = useAuth()
 	const {cars} = useCar()
 	const car = cars[carId-1]
 
 	const [price, setPrice] = useState(0)
+	const [bookTimer, setBookTimer] = useState({hours: 0, minutes: 0, seconds: 0})
 	const [timer, setTimer] = useState({hours: 0, minutes: 0, seconds: 0})
 	const [message, setMessage] = useState(null)
-	const [timerLeft, setTimLeft] = useState(null)
+	const [timerLeft, setTimerLeft] = useState(null)
+	const [timeToBook, setTimeToBook] = useState(null)
+	
 
 	const [reservationId, setReservationId] = useState(null)
 
@@ -79,18 +82,21 @@ export default function ReservationForm1({carId}){
 					// 	console.log('refreshed')
 					// }
 					// console.log(response)
-					setMessage(response.message)
+					setMessage({text: response.message, color: 'text-red-500'})
 					setTimeout(()=>{setMessage(null)}, 4000)
 				}else
 				{
-					setMessage("You have successfully booked the car!")
+					setMessage({text: "You have successfully booked the car!", color: 'text-green-500'})
 					setTimeout(()=>{setMessage(null)}, 4000)
 					const endTime = new Date(new Date(response.data.end_date).toISOString().slice(0, 16)).getTime()
 					const startTime = new Date(new Date(response.data.start_date).toISOString().slice(0, 16)).getTime()
 					const now = new Date().getTime()
 					const time = endTime - startTime
 					console.log(startTime)
-					setTimLeft(time - (now - startTime))
+					setTimerLeft(time - (now - startTime))
+					if (startTime > now){
+						setTimeToBook(startTime - now)
+					}
 					setReservationId(response.data.id)
 				}
 			}catch(error){
@@ -109,7 +115,10 @@ export default function ReservationForm1({carId}){
 					const startTime = new Date(response.data[0].start_date).toISOString().slice(0, 16)
 					const endTime = new Date(response.data[0].end_date).toISOString().slice(0, 16)
 					const now = new Date().getTime()
-					setTimLeft((new Date(endTime).getTime() - new Date(startTime).getTime()) - (now - new Date(startTime).getTime()))
+					setTimerLeft((new Date(endTime).getTime() - new Date(startTime).getTime()) - (now - new Date(startTime).getTime()))
+					if (new Date(startTime).getTime() > now){
+						setTimeToBook(new Date(startTime).getTime() - now)
+					}
 					setReservationId(response.data[0].id)
 				}
 			}catch(error){
@@ -126,6 +135,11 @@ export default function ReservationForm1({carId}){
 				console.log(error)
 			}
 		}
+
+		useEffect(()=>{
+			const interval = setInterval(()=>{setCurrentTime(prev=>prev+60000)}, 60000)
+			return ()=>{clearInterval(interval)}
+		}, [])
 
 		useEffect(()=>{
 			fetchReservations()
@@ -163,9 +177,9 @@ export default function ReservationForm1({carId}){
 			if (timer!=null &&  timerLeft > 0 && timerLeft < 1000){
 				handleDeleteReservation(Number(reservationId))
 				console.log('deleted')
-				setMessage("Reserve is deleted successfully!")
+				setMessage({text: "Reservation is deleted successfully!", color: 'text-orange-500'})
 				const timeOut = setTimeout(()=>{setMessage(null)}, 4000)
-				setTimLeft(null)
+				setTimerLeft(null)
 			}
 			// return ()=>clearTimeout(timeOut)
 			
@@ -173,20 +187,56 @@ export default function ReservationForm1({carId}){
 
 
 		useEffect(()=>{
+			if (timeToBook>=0){
+				const hours = timeToBook/3600000
+				const hoursF = Math.floor(hours)
+				const minutes = (hours - hoursF) * 60
+				const minutesF = Math.floor(minutes)
+				const seconds = Number(((minutes- minutesF) * 60).toFixed(0))
+				// console.log(hoursF, minutesF, seconds)
+				console.log(timeToBook)
+				console.log(bookTimer)
+	
+				
+				
+				// console.log(timerLeft)
+				// if (dropOffDate> pickUpDate){
+					// setPrice(car.price * hours)
+					setBookTimer({hours: hoursF, minutes: minutesF, seconds: seconds})
+				// }
+				}
+	
+				if (bookTimer!=null &&  timeToBook > 0 && timeToBook < 1000){
+					setMessage({text: "Reservation is activated successfully!", color: 'text-green-500'})
+					const timeOut = setTimeout(()=>{setMessage(null)}, 4000)
+					setTimeToBook(null)
+				}
+		}, [timeToBook])
+
+
+		useEffect(()=>{
 			if (timerLeft >= 0){
 				const interval = setInterval(()=>{
+						setTimerLeft(prev=>prev - 1000)
+				}, 1000)
+				return ()=>clearInterval(interval)
+			}
+		}, [])
 
-						setTimLeft(prev=>prev - 1000)
+		useEffect(()=>{
+			if (timeToBook >= 0){
+				const interval = setInterval(()=>{
+						setTimeToBook(prev=>prev - 1000)
 				}, 1000)
 				return ()=>clearInterval(interval)
 			}
 		}, [])
 
 
+
 	return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
-            <div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full">
-                <h2 className="text-center text-3xl font-semibold text-yellow-400 mb-6">Book a Car</h2>
+            <div className="bg-gray-800 p-8 rounded-xl shadow-[5px_5px_17px_1px] shadow-gray-800  max-w-lg w-full">
+                <h2 className="text-center text-3xl font-semibold text-gray-200 mb-6">Book a Car</h2>
                 <form onSubmit={handleReservation} className="space-y-4">
                     {/* <div>
                         <label className="block text-sm text-gray-300 mb-2">Phone</label>
@@ -201,19 +251,20 @@ export default function ReservationForm1({carId}){
                         <input type="text" className="w-full p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Enter ZIP/Location"  onChange={(e) => setDestination(e.target.value)} required />
                     </div> */}
                     <div>
-                        <label className="block text-sm text-gray-300 mb-2">Pickup Date</label>
-                        <input type="datetime-local" className="w-full p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400" min={new Date().toISOString().slice(0, 16)} value={pickUpDate} onChange={handlePickUp} required />
+                        <label className="block text-sm text-gray-200 mb-2">Pickup Date</label>
+                        <input type="datetime-local" className="w-full p-3 rounded-md bg-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-white" min={new Date(currentTime).toISOString().slice(0, 16)} value={pickUpDate} onChange={handlePickUp} required />
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-300 mb-2">Dropoff Date</label>
-                        <input type="datetime-local" className="w-full p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400" min={pickUpDate} value={dropOffDate} onChange={handleDropOff} required />
+                        <label className="block text-sm text-gray-200 mb-2">Dropoff Date</label>
+                        <input type="datetime-local" className="w-full p-3 rounded-md bg-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-white" min={pickUpDate} value={dropOffDate} onChange={handleDropOff} required />
                     </div>
-					{timerLeft>0 && <p className='text-slate-100 font-bold'>{timer.hours}:{timer.minutes}:{timer.seconds}</p>}
-                    <button type="submit" className="w-full p-3 mt-4 bg-yellow-400 text-gray-900 font-bold rounded-md hover:bg-yellow-500 transition">Book Now</button>
-                    {message && <p className={`text-center ${message.startsWith('You')? "text-green-400": "text-red-400"} mt-4 text-lg`}>{message}</p>}
+					{(timerLeft>0 && timeToBook<=0)&& <p className={timer.hours>=1? 'text-green-700': 'text-orange-600'}>{timer.hours}:{timer.minutes}:{timer.seconds}</p>}
+					{timeToBook>0 && <p className='text-slate-100 font-bold'>The reservation will be active in {bookTimer.hours}:{bookTimer.minutes}: {bookTimer.seconds}</p>}
+                    <button type="submit" className="w-full p-3 mt-4 bg-slate-300 text-amber-600 text-xl font-bold rounded-md focus:outline-none 
+					hover:bg-amber-600 hover:text-slate-300 hover:outline-none transition focus:ring-offset-0 shadow-[2px_2px_10px_0.5px] shadow-slate-400">Book Now</button>
+                    {message && <p className={`text-center ${message.color} mt-4 text-lg`}>{message.text}</p>}
                 </form>
             </div>
-        </div>
     );
 	
 }

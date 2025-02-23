@@ -24,13 +24,15 @@ export default function CarReservation(){
     let InfoContainer
     try{
         InfoContainer = (
-            <div>
-                <img className="w-3/6 h-fit aspect-[4/3] object-cover" src={car.car_photo} alt={car.name} />
-                <h2>{car.name}</h2>
-                <h2>{car.brand}</h2>
-                <h2>{car.description}</h2>
-                <h2>{car.year}</h2>
-                <h2>{car.price}</h2>
+            <div className="flex flex-col">
+                <div className="flex  px-5 py-3" >
+                <div className="flex flex-col gap-6 justify-between w-full">
+                    <p className="w-3/6 text-center font-sans font-bold text-3xl text-slate-900 [text-shadow:_1px_2px_4px]">{car.name}</p>
+                    <img className="w-3/6 h-fit aspect-[4/3] object-cover rounded-xl ring-2 ring-gray-500" src={car.car_photo} alt={car.name} />
+                </div>
+                <ReservationForm1 carId={Number(carId)}/>
+                </div>
+                <CarDetails car={car}/>
             </div>
         )
     }catch(error){
@@ -40,8 +42,5 @@ export default function CarReservation(){
 
     return <>
     {InfoContainer}
-    
-    <CarDetails/>
-    <ReservationForm1 carId={Number(carId)}/>
     </>
 }
