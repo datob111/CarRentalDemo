@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,6 +29,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#
+#     }
+# }
 
 # Application definition
 
@@ -38,11 +44,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
     'user_auth',
-    'cars'
+    'cars',
+    'twilio',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.github',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -108,6 +123,12 @@ DATABASES = {
 
 
 AUTH_USER_MODEL = 'user_auth.CustomUser'
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_UNIQUE_EMAIL = True
+
+SOCIALACCOUNT_ADAPTER = 'user_auth.adapters.CustomAccountAdapter'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -152,6 +173,23 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+#twlio settings
+
+
+env = environ.Env()
+environ.Env.read_env()
+
+env_file = os.path.join(BASE_DIR, ".env")
+if os.path.exists(env_file):
+    env.read_env(env_file)
+    print(f".env file loaded from: {env_file}")
+
+ACCOUNT_SID = env('ACCOUNT_SID')
+AUTH_TOKEN = env('AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER')
+
+
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -161,3 +199,15 @@ REST_FRAMEWORK = {
         'user_auth.authentication.CustomJWTAuthentication',
     ],
 }
+
+
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+SITE_ID = 2
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_LOGOUT_ON_GET = True
+
+

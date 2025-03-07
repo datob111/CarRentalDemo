@@ -1,5 +1,7 @@
 import json
 
+import requests
+
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -10,6 +12,11 @@ from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.generics import ListAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action, api_view, permission_classes
+
+
+from twilio.rest import Client
+from django.conf import settings
+
 
 from .models import Car, Reservation
 from .serializers import CarSerializer, ReservationSerializer, TimeSerializer
@@ -113,6 +120,17 @@ def reservation_create(request):
             serializer.save()
             car.is_rented = True
             car.save()
+
+            message = f"Hello, You have booked the car - {car.name} from {start_date} to {end_date}."
+            # resp = requests.post('https://textbelt.com/text', {
+            #     'phone': '+995' + request.user.phone_number,
+            #     'message': message,
+            #     'key': 'textbelt',
+            # })
+            # print(resp.json())
+            client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
+            client.messages.create(to='+995' + request.user.phone_number,
+                                   from_=settings.TWILIO_PHONE_NUMBER, body=message)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -12,6 +12,7 @@ import CarProvider from './contexts/useCar.jsx'
 
 
 
+
 const theme = createTheme({
   typography: {
     body1: {
@@ -39,7 +40,7 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <AuthProvider>
         <CarProvider>
-          <App />
+            <App />
         </CarProvider>
       </AuthProvider>
       </BrowserRouter>
