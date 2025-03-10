@@ -29,11 +29,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-#
-#     }
-# }
 
 # Application definition
 
@@ -57,6 +52,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.github',
+    'django_crontab',
+    'celery',
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
@@ -70,6 +68,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware'
 ]
+
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173'
@@ -110,6 +109,8 @@ WSGI_APPLICATION = 'car_rental_b.wsgi.application'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media_files')
 MEDIA_URL = '/media/'
+
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -154,7 +155,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tbilisi'
 
 USE_I18N = True
 

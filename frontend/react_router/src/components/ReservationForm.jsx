@@ -32,10 +32,6 @@ export default function ReservationForm1({carId}){
 	const [pickUpDate, setPickUpDate] = useState(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16))
 	const [dropOffDate, setDropOffDate] = useState(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16))
 
-	// const [finalPickUpDate, setFinalPickUpDate] = useState(0)
-	// const [finalDropOffDate, setFinalDropOffDate] = useState(0)
-
-	// const {currentUser} = useAuth()
 	const {cars} = useCar()
 	const car = cars[carId-1]
 
@@ -49,24 +45,10 @@ export default function ReservationForm1({carId}){
 	const {setPickUpLocation} = useContext(LocationsContext)
 	const {setDropOffLocation} = useContext(LocationsContext)
 
-
-
 	const [reservationId, setReservationId] = useState(null)
 
 	const {isAuthenticated} = useAuth()
 	const {setIsAuthenticated} = useAuth()
-
-	const mapRef = useRef()
-  	const mapContainerRef = useRef()
-	const markerRef = useRef()
-	const markerRef2 = useRef()
-
-
-
-
-
-
-
 
 		const handlePickUp = (e)=>{
 			setPickUpDate(e.target.value)
@@ -77,10 +59,7 @@ export default function ReservationForm1({carId}){
 
 		const handleDropOff = (e)=>{
 			setDropOffDate(e.target.value)
-			// console.log(dropOffDate)
 		}
-
-
 
 		const handleReservation =  async (e)=> {
 			try{
@@ -99,28 +78,27 @@ export default function ReservationForm1({carId}){
 				}
 				
 				if (response.message !=null){
-					// console.log(response)
-					// // console.log(currentUser)
-					// const refreshed = await RefreshToken()
-					// if (refreshed){
-					// 	response = await CarReservation(carId, pickUpDate, dropOffDate, price)
-					// 	console.log('refreshed')
-					// }
-					// console.log(response)
 					setMessage({text: response.message, color: 'text-red-500'})
 					setTimeout(()=>{setMessage(null)}, 4000)
 				}else
 				{
 					setMessage({text: "You have successfully booked the car!", color: 'text-green-500'})
 					setTimeout(()=>{setMessage(null)}, 4000)
-					const endTime = new Date(new Date(response.data.end_date).toISOString().slice(0, 16)).getTime()
-					const startTime = new Date(new Date(response.data.start_date).toISOString().slice(0, 16)).getTime()
+					let endTime = new Date(response.data.end_date);
+					const offsetEnd = endTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+					endTime = new Date(new Date(endTime - offsetEnd).toISOString().slice(0, 16)).getTime();
+					let startTime = new Date(response.data.start_date)
+					const offsetStart = startTime.getTimezoneOffset() * 60000
+					startTime = new Date(new Date(startTime - offsetStart).toISOString().slice(0, 16)).getTime();
 					const now = new Date().getTime()
 					const time = endTime - startTime
-					console.log(startTime)
+					console.log(endTime, startTime, new Date())
+					console.log(now)
 					setTimerLeft(time - (now - startTime))
+					console.log(time - (now - startTime))
 					if (startTime > now){
 						setTimeToBook(startTime - now)
+						console.log(startTime - now)
 					}
 					setReservationId(response.data.id)
 				}
@@ -137,8 +115,12 @@ export default function ReservationForm1({carId}){
 				console.log(response.data[0].id)
 				
 				if (response.data != []){
-					const startTime = new Date(response.data[0].start_date).toISOString().slice(0, 16)
-					const endTime = new Date(response.data[0].end_date).toISOString().slice(0, 16)
+					let endTime = new Date(response.data[0].end_date);
+					const offsetEnd = endTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+					endTime = new Date(new Date(endTime - offsetEnd).toISOString().slice(0, 16)).getTime();
+					let startTime = new Date(response.data[0].start_date)
+					const offsetStart = startTime.getTimezoneOffset() * 60000
+					startTime = new Date(new Date(startTime - offsetStart).toISOString().slice(0, 16)).getTime();
 					const now = new Date().getTime()
 					setTimerLeft((new Date(endTime).getTime() - new Date(startTime).getTime()) - (now - new Date(startTime).getTime()))
 					if (new Date(startTime).getTime() > now){
@@ -168,7 +150,6 @@ export default function ReservationForm1({carId}){
 
 		useEffect(()=>{
 			fetchReservations()
-			// console.log(timerLeft)
 		}, [])
 
 
@@ -186,17 +167,10 @@ export default function ReservationForm1({carId}){
 			const minutes = (hours - hoursF) * 60
 			const minutesF = Math.floor(minutes)
 			const seconds = Number(((minutes- minutesF) * 60).toFixed(0))
-			// console.log(hoursF, minutesF, seconds)
 			console.log(timerLeft)
 			console.log(timer)
 
-			
-			
-			// console.log(timerLeft)
-			// if (dropOffDate> pickUpDate){
-				// setPrice(car.price * hours)
 				setTimer({hours: hoursF, minutes: minutesF, seconds: seconds})
-			// }
 			}
 
 			if (timer!=null &&  timerLeft > 0 && timerLeft < 1000){
@@ -218,17 +192,9 @@ export default function ReservationForm1({carId}){
 				const minutes = (hours - hoursF) * 60
 				const minutesF = Math.floor(minutes)
 				const seconds = Number(((minutes- minutesF) * 60).toFixed(0))
-				// console.log(hoursF, minutesF, seconds)
 				console.log(timeToBook)
 				console.log(bookTimer)
-	
-				
-				
-				// console.log(timerLeft)
-				// if (dropOffDate> pickUpDate){
-					// setPrice(car.price * hours)
 					setBookTimer({hours: hoursF, minutes: minutesF, seconds: seconds})
-				// }
 				}
 	
 				if (bookTimer!=null &&  timeToBook > 0 && timeToBook < 1000){
@@ -279,8 +245,6 @@ export default function ReservationForm1({carId}){
 					hover:bg-amber-600 hover:text-slate-300 hover:outline-none transition focus:ring-offset-0 ">Book Now</button>
                     {message && <p className={`text-center ${message.color} mt-4 text-lg`}>{message.text}</p>}
                 </form>
-				{/* <div  className='h-72 rounded-lg' id='map-container' ref={mapContainerRef}></div> */}
-				
             </div>
     );
 	

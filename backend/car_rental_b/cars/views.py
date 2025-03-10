@@ -71,8 +71,6 @@ class ReservationViewSet(ModelViewSet):
     serializer_class = ReservationSerializer
     permission_classes = []
 
-
-
     @action(methods=['get'], detail=True, url_path='reservation_time', url_name='reservation_time')
     def reservation_time(self, request, pk=None):
         reservation = get_object_or_404(Reservation, pk=pk)

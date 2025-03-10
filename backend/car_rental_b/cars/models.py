@@ -21,7 +21,7 @@ class Reservation(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reservations')
     payment_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(db_index=True)
     price = models.DecimalField(max_digits=15, decimal_places=2)
 
     def __str__(self):
