@@ -8,7 +8,7 @@ import AuthProvider from './contexts/useAuth.jsx'
 import { LocalizationProvider, DateTimePicker, DatePicker } from '@mui/x-date-pickers'
 import { createTheme, ThemeProvider } from '@mui/system'
 import CarProvider from './contexts/useCar.jsx'
-
+import MessagesProvider from './contexts/MessagesContext.jsx'
 
 
 
@@ -40,7 +40,9 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <AuthProvider>
         <CarProvider>
+          <MessagesProvider>
             <App />
+          </MessagesProvider>
         </CarProvider>
       </AuthProvider>
       </BrowserRouter>

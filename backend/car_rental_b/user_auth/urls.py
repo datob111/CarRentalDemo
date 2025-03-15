@@ -16,4 +16,6 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('is_auth', views.is_auth, name='is_auth'),
     path('get_user', views.get_user, name='get_user'),
+    path('get_messages', views.get_messages, name='get_messages'),
+    path('get_new_messages', views.see_new_messages, name='get_new_messages'),
 ]

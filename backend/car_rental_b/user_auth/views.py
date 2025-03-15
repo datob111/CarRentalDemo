@@ -10,8 +10,8 @@ from rest_framework.authentication import BasicAuthentication, SessionAuthentica
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import CustomUser, Payment
-from .serializers import CustomUserSerializer, PaymentSerializer, UserRegistrationSerializer
+from .models import CustomUser, Payment, Messages
+from .serializers import CustomUserSerializer, PaymentSerializer, MessageSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 # Create your views here.
@@ -153,6 +153,28 @@ def get_user(request):
     except:
         return Response({'success': False}, status=status.HTTP_401_UNAUTHORIZED)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_messages(request):
+    try:
+        messages = Messages.objects.filter(user=request.user).order_by('-date')
+        serialized_messages = MessageSerializer(messages, many=True)
+        return Response(serialized_messages.data)
+    except Exception:
+        return Response({'message': str(Exception)}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def see_new_messages(request):
+    try:
+        user = request.user
+        user.new_messages_count = 0
+        user.save()
+        return Response('All messages have been seen successfully')
+    except Exception:
+        return Response({'message': str(Exception)}, status=status.HTTP_401_BAD_REQUEST)
 
 
 

@@ -11,17 +11,7 @@ import { useCar } from "../contexts/useCar";
 
 
 export default function Cars(){
-    // const {cars} = useCar()
-
     const [cars, setCars] = useState([])
-
-    // const getCars = ()=>{
-    //     axios.get('http://127.0.0.1:8000/cars/').
-    //   then(response => {
-    //     setCars(response.data)
-    //     console.log(response.data)
-    //   }).catch(error=>console.log(error))
-    //   }
 
       async function fetchData() {
               try{
@@ -42,7 +32,7 @@ export default function Cars(){
       useEffect(()=>{
         fetchData()
       }, [])
-
+      
     return <>
     <Carousel className='flex gap-8 bg-gray-700 py-3' responsive={responsive} infinite={true}
   draggable={true}

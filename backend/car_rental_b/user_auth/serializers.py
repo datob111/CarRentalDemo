@@ -2,7 +2,7 @@ from django.utils import timezone
 
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
-from .models import CustomUser, Payment
+from .models import CustomUser, Payment, Messages
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -15,7 +15,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ('id', 'email', 'first_name', 'last_name', 'password1', 'password2',
                   'password', 'date_of_join', 'is_active', 'is_staff', 'last_login',
-                  'is_superuser', 'phone_number', 'card_number', 'profile_photo')
+                  'is_superuser', 'phone_number', 'card_number', 'profile_photo', 'new_messages_count')
         read_only_fields = ['id', 'last_login', 'date_of_join', 'password']
 
     def validate_password2(self, value):
@@ -53,3 +53,14 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = '__all__'
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    date = serializers.SerializerMethodField()
+    class Meta:
+        model = Messages
+        fields = '__all__'
+
+    def get_date(self, obj):
+        local_time = timezone.localtime(obj.date)
+        return local_time.strftime('%Y-%m-%d %H:%M')

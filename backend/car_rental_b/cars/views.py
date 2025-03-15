@@ -1,7 +1,7 @@
 import json
 
 import requests
-
+from user_auth.models import Messages
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -13,6 +13,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action, api_view, permission_classes
 
+from django.contrib import messages
 
 from twilio.rest import Client
 from django.conf import settings
@@ -96,6 +97,8 @@ class ReservationViewSet(ModelViewSet):
             car.is_rented = False
             car.save()
             reservation.delete()
+            new_message = Messages(message="The reservation time has expired.", type="info", user=reservation.user)
+            new_message.save()
             return Response({'cancel_reservation': 'success', 'delete_reservation': 'success'}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -110,7 +113,7 @@ def reservation_create(request):
     price = request.data['price']
     if car:
         if car.is_rented:
-            return Response({'message': 'the car is already booked!'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'The car is already booked!'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             serializer = ReservationSerializer(data={'user': user_pk, 'car': car_pk, 'start_date':
                 start_date, 'end_date': end_date, 'price': price})
@@ -126,9 +129,10 @@ def reservation_create(request):
             #     'key': 'textbelt',
             # })
             # print(resp.json())
-            client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
-            client.messages.create(to='+995' + request.user.phone_number,
-                                   from_=settings.TWILIO_PHONE_NUMBER, body=message)
+            # client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
+            # client.messages.create(to='+995' + request.user.phone_number,
+            #                        from_=settings.TWILIO_PHONE_NUMBER, body=message)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

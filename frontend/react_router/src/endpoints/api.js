@@ -12,6 +12,8 @@ const getUserUrl = `${baseUrl}get_user`
 const CarReservationUrl = 'http://127.0.0.1:8000/cars_list/reserve-car/'
 const getReservationsUrl = 'http://127.0.0.1:8000/get_reservations/'
 const deleteReservationUrl = 'http://127.0.0.1:8000/reservations/'
+const getMessagesUrl = `${baseUrl}get_messages`
+const seeNewMEssagesUrl = `${baseUrl}get_new_messages`
 
 
 
@@ -167,3 +169,28 @@ export async function DeleteReservation(pk) {
         
     }
 } 
+
+
+export async function GetMessages() {
+    try{
+        const response = axios.get(getMessagesUrl, {withCredentials: true})
+        return response
+    }catch(error){
+        await RefreshToken()
+        console.log(error.response.data)
+        console.log('refreshed')
+        return await axios.delete(getMessagesUrl, {withCredentials:true})
+    }
+}
+
+export async function seeNewMessages() {
+    try{
+        const response = axios.get(seeNewMEssagesUrl, {withCredentials: true})
+        return response
+    }catch(error){
+        await RefreshToken()
+        console.log(error.response.data)
+        console.log('refreshed')
+        return await axios.delete(getMessagesUrl, {withCredentials:true})
+    }
+}

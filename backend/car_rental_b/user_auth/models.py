@@ -35,6 +35,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=12, null=False)
     card_number = models.CharField(max_length=12, null=False)
     profile_photo = models.ImageField(upload_to='profile_photos/', default='profile_photos/default_profile_photo.png', blank=True, null=True)
+    new_messages_count = models.PositiveIntegerField(default=0)
 
     objects = CustomUserManager()
     username = None
@@ -49,4 +50,17 @@ class Payment(models.Model):
 
     def __str__(self):
         return f'{self.amount} {self.date}'
+
+class Messages(models.Model):
+    types = {
+        'sc': 'success',
+        'fl': 'fail',
+        'wn': 'warning',
+        'in': 'info'
+    }
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='messages')
+    message = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=15, choices=types)
+
 
