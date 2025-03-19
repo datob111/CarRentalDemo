@@ -34,7 +34,7 @@ export default function Cars(){
       }, [])
       
     return <>
-    <Carousel className='flex gap-8 bg-gray-700 py-3' responsive={responsive} infinite={true}
+    <Carousel className='flex gap-8 bg-gray-700 py-3 z-0' responsive={responsive} infinite={true}
   draggable={true}
   showDots={false}  keyBoardControl={true} ssr={true}
   autoPlay={true}
@@ -42,6 +42,8 @@ export default function Cars(){
   containerClass="carousel-container"
   dotListClass="custom-dot-list-style"
   itemClass="px-6 "
+// arrows={false}
+rtl={true}
   >
     {cars.map(car=>{
           return (<CarCard id={car.id} key={car.id} name={car.name} brand={car.brand} description={car.description} 

@@ -4,7 +4,8 @@ import { Outlet } from "react-router-dom"
 import { Logout } from "../endpoints/api"
 import { useState, useEffect } from "react"
 import { useAuth } from "../contexts/useAuth"
-import {AiOutlineMessage} from "react-icons/ai"
+import {AiOutlineMessage, AiOutlineNotification} from "react-icons/ai"
+import { IoMdNotifications } from "react-icons/io";
 import MessagesContainer from "./MessagesContainer"
 import { useMessages } from "../contexts/MessagesContext";
 import { seeNewMessages } from "../endpoints/api"
@@ -12,6 +13,7 @@ import { seeNewMessages } from "../endpoints/api"
 export default function Navbar(){
 
         const {messageDisplay, setMessageDisplay, newMessages, setNewMessages} = useMessages()
+        const {shakeBell} = useMessages()
 
         const {isAuthenticated} = useAuth()
         const backToLogin = useNavigate()
@@ -59,9 +61,13 @@ export default function Navbar(){
         const notAuthContent = <div className="flex gap-14 align">
         <li className="'hover:bg-slate-300 hover:text-gray-700 flex align-middle">
             
-            <button className=" flex focus:outline-none hover:outline-none" onClick={(e)=>{clickMessage(e)}}>
-                {<AiOutlineMessage className="text-gray-200 hover:scale-110" size={24}/>}
-                <p className="text-base text-green-400 font-semibold">{newMessages}</p>
+            <button className="relative flex focus:outline-none hover:outline-none" onClick={(e)=>{clickMessage(e)}}>
+                {<IoMdNotifications className={`text-orange-600 hover:scale-110 bg-gray-100 rounded-full p-0.5 ${shakeBell>0 && 'animate-wobble'}`} size={28}/>}
+               {newMessages > 0 && (
+                 <div className="bg-red-800 rounded-full absolute -top-1 left-5 w-5 h-5">
+                 <p className="text-sm text-white font-semibold">{newMessages}</p>
+                 </div>
+               )}
                 </button>
         </li>
         <li className='hover:bg-slate-300 hover:text-gray-700 focus:outline-none hover:outline-none flex align-middle'>

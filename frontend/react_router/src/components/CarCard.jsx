@@ -15,7 +15,7 @@ export default function CarCard({id, name, brand, description, release_year, pri
             style: 'currency',
         }
     ).format(price)
-    return (<div className='flex-col flex-wrap bg-slate-400 font-bold px-6 py-3 border-2 border-r-emerald-100'>
+    return (<div className='flex-col flex-wrap bg-slate-400 font-bold px-6 py-3 border-2 border-r-emerald-100 cursor-pointer'>
 
         <img className="border-2 border-red-300 w-fit h-fit aspect-[4/3] object-cover" src={car_image} alt="" />
 

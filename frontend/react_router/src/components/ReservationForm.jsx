@@ -5,7 +5,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import { LocationsContext } from '../contexts/LocationsContext'
 import MapBoxMap from './MapBoxMap'
 // import ReactMapGl, {Marker} from 'react-map-gl'
-import axios from 'axios'
+import { useMessages } from '../contexts/MessagesContext'
 
 
 // import { LocalizationProvider } from '@mui/x-date-pickers'
@@ -48,6 +48,8 @@ export default function ReservationForm1({carId}){
 
 	const {isAuthenticated} = useAuth()
 	const {setIsAuthenticated} = useAuth()
+
+	const {setNewMessages} = useMessages()
 
 		const handlePickUp = (e)=>{
 			setPickUpDate(e.target.value)
@@ -100,6 +102,7 @@ export default function ReservationForm1({carId}){
 						console.log(startTime - now)
 					}
 					setReservationId(response.data.id)
+					
 				}
 			}catch(error){
 				console.log({'error': error})

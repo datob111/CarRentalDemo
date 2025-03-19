@@ -1,9 +1,12 @@
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from cars.models import Reservation
-from .models import Messages
+from .models import Messages, CustomUser
 from twilio.rest import Client
 from django.conf import settings
+
+from channels.layers import get_channel_layer
+from asgiref.sync import sync_to_async, async_to_sync
 
 # @receiver(post_delete, sender=Reservation)
 # def reservation_delete(sender, instance, **kwargs):
@@ -28,3 +31,23 @@ def add_message(sender, instance, **kwargs):
     instance.user.new_messages_count += 1
     instance.user.save()
     print(instance.user.new_messages_count)
+
+
+@receiver(post_save, sender=Messages)
+def real_time_messages(sender, instance, **kwargs):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'messages_channel',
+        {'type': 'receive', 'message': 'well done!!!'}
+    )
+
+
+# @receiver(post_save, sender=CustomUser)
+# def create_user_profile(sender, instance, created, **kwargs):
+#     channel_layer = get_channel_layer()
+#     async_to_sync(channel_layer.group_send)(
+#         'users', {
+#             'type': 'receive',
+#             'message': 'updated',
+#         }
+#     )

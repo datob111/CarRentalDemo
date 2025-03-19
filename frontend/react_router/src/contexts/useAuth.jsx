@@ -10,6 +10,7 @@ export default function AuthProvider({children}){
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [currentUser, setCurrentUser] = useState(null)
     const location = useLocation()
+    const [connetction, setConnection] = useState(null)
 
     useEffect(()=>{
 
@@ -51,7 +52,28 @@ export default function AuthProvider({children}){
         !isAuthenticated && setCurrentUser(null)
     }, [isAuthenticated])
 
-    return <AuthContext.Provider value={{isAuthenticated, setIsAuthenticated, currentUser}}>
+
+    // useEffect(()=>{
+    //     const socket = new WebSocket('ws://localhost:8000/ws/user_update/')
+        
+    //     socket.onopen = ()=>{
+    //        console.log('opened')
+    //     }
+    
+    //     socket.onmessage = (e) => {
+    //         console.log(e.data)
+    //     }
+
+    //     socket.onclose = ()=>{
+    //         console.log('closed')
+    //     }
+
+    //     setConnection(socket)
+
+    //     return ()=>{socket.close()}
+    // }, [])
+
+    return <AuthContext.Provider value={{isAuthenticated, setIsAuthenticated, currentUser, setCurrentUser}}>
         {children}
     </AuthContext.Provider>
 

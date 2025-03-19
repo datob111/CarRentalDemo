@@ -35,7 +35,8 @@
     "react-multi-carousel": "^2.8.5",
     "react-router-dom": "^7.1.5",
     "sass": "^1.85.1",
-    "styled-components": "^6.1.15"
+    "styled-components": "^6.1.15",
+    "use-sound": "^5.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
