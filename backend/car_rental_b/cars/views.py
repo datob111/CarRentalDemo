@@ -90,6 +90,9 @@ class ReservationViewSet(ModelViewSet):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
     def destroy(self, request, *args, **kwargs):
         reservation = get_object_or_404(Reservation, pk=kwargs['pk'])
         if reservation:

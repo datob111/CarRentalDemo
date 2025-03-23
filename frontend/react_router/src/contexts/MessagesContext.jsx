@@ -39,6 +39,7 @@ export default function MessagesProvider({children}){
         useEffect(()=>{
             if (currentUser)
             setNewMessages(currentUser.new_messages_count)
+            handleMessages();
             console.log(currentUser)
         }, [currentUser])
 

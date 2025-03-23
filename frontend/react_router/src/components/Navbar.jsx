@@ -15,11 +15,12 @@ export default function Navbar(){
         const {messageDisplay, setMessageDisplay, newMessages, setNewMessages} = useMessages()
         const {shakeBell} = useMessages()
 
-        const {isAuthenticated} = useAuth()
+        const {isAuthenticated, setIsAuthenticated} = useAuth()
         const backToLogin = useNavigate()
 
         const handleLogout=()=>{
             Logout()
+            setIsAuthenticated(false)
             backToLogin('/login')
         }
 

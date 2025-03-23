@@ -1,5 +1,5 @@
 import { Button, VStack, FormControl, FormLabel, Input } from '@chakra-ui/react'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Login as login, RefreshToken} from '../endpoints/api';
 import { useNavigate } from 'react-router-dom';
 import {useCookies} from 'react-cookie'
@@ -10,22 +10,17 @@ function Login(){
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const navigate = useNavigate()
-    const {isAuthenticated} = useAuth()
+    const {isAuthenticated, setIsAuthenticated} = useAuth()
     const [messages, setMessages] = useState([])
 
-    if (isAuthenticated){
-        navigate('/home')
-    }
+   
 
     const handleLogin = async (e)=>{
         try{
             e.preventDefault()
             const response = await login(email, password)
+            setIsAuthenticated(true)
                 navigate('/home')
-
-            
-            
-
         }catch(error){
             console.log(error)
             console.log(messages)
@@ -43,6 +38,12 @@ function Login(){
         }
     
     }
+
+    useEffect(()=>{
+        if (isAuthenticated){
+            navigate('/home')
+        }
+    }, [])
 
    return (
         <form className='m-auto w-fit my-32 ' action="" onSubmit={handleLogin}>

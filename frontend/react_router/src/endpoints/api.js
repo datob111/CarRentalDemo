@@ -14,8 +14,7 @@ const getReservationsUrl = 'http://127.0.0.1:8000/get_reservations/'
 const deleteReservationUrl = 'http://127.0.0.1:8000/reservations/'
 const getMessagesUrl = `${baseUrl}get_messages`
 const seeNewMEssagesUrl = `${baseUrl}get_new_messages`
-
-
+const updateProfilePhotoUrl = `${baseUrl}get_user`
 
 
 export async function Login(email, password){
@@ -114,9 +113,9 @@ export async function getUser() {
         const response = await axios.get(getUserUrl, {withCredentials:true})
         return response.data
     }catch(error){
-            await refreshTokenUrl()
+            await RefreshToken()
         console.log(error)
-        console.log('otra noche, otra!!!')
+        console.log('refreshed')
         const response = await axios.get(getUserUrl, {withCredentials:true})
         return response.data
     }
@@ -192,5 +191,45 @@ export async function seeNewMessages() {
         console.log(error.response.data)
         console.log('refreshed')
         return await axios.delete(getMessagesUrl, {withCredentials:true})
+    }
+}
+
+
+export async function updateProfilePhoto(profilePicture) {
+    const formData = new FormData()
+        formData.append('profile_photo', profilePicture)
+    try{
+        const response = await axios.put(updateProfilePhotoUrl, formData, {withCredentials:true} )
+        return response.data
+    }catch(error){
+            await RefreshToken()
+        console.log(error)
+        console.log('refreshed')
+        const response = await axios.put(updateProfilePhotoUrl, formData, {withCredentials:true})
+        return response.data
+    }
+}
+
+
+export async function updateUserField(pk, fieldkey, field) {
+    let data;
+    if (fieldkey == 'email'){
+        data = {'email': field}
+    }else{
+        data = {'phone_number': field}
+    }
+
+    const updateUrl = `http://127.0.0.1:8000/auth/update_user_data`
+    try{
+
+        const response = await axios.put(updateUrl, data, {withCredentials:true} )
+        console.log(response)
+        return response.data
+    }catch(error){
+            await RefreshToken()
+        console.log(error)
+        console.log('refreshed')
+        const response = await axios.put(updateUrl, {}, {withCredentials:true})
+        return response.data
     }
 }

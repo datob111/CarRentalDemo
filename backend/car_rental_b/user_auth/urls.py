@@ -18,4 +18,5 @@ urlpatterns = [
     path('get_user', views.get_user, name='get_user'),
     path('get_messages', views.get_messages, name='get_messages'),
     path('get_new_messages', views.see_new_messages, name='get_new_messages'),
+    path('update_user_data', views.update_user, name='update_user_data'),
 ]

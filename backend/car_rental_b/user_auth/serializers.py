@@ -32,7 +32,27 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def get_profile_photo(self, obj):
-        return 'https://' + obj.profile_photo.url
+        if obj.profile_photo:
+            return 'https://' + obj.profile_photo.url
+        else:
+            return "https://127.0.0.1:8000/media/profile_photos/default_profile_photo.png"
+
+
+class CustomUserImageUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('profile_photo', )
+
+
+class CustomUserUpdateSerializer(serializers.ModelSerializer):
+    # phone_number = serializers.CharField(required=False, style={'input_type': 'number'})
+    # email = serializers.EmailField(required=False, style={'input_type': 'email'})
+    class Meta:
+        model = CustomUser
+        fields = ('phone_number', 'email')
+        extra_kwargs = {'phone_number': {'required': False, 'style': {'input_type': 'number'}},
+                        'email': {'required': False, 'style': {'input_type': 'email'}}}
+
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):

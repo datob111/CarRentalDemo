@@ -8,10 +8,10 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from .models import CustomUser, Payment, Messages
-from .serializers import CustomUserSerializer, PaymentSerializer, MessageSerializer
+from .serializers import CustomUserSerializer, PaymentSerializer, MessageSerializer, CustomUserImageUpdateSerializer, CustomUserUpdateSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 # Create your views here.
@@ -22,9 +22,9 @@ class UserViewSet(ModelViewSet):
     authentication_classes = [BasicAuthentication, SessionAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = CustomUserSerializer
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-
+    
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         try:
@@ -144,14 +144,23 @@ def is_auth(request):
     return Response(serializer != None)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT'])
 @permission_classes([IsAuthenticated])
 def get_user(request):
     try:
-        serializer = CustomUserSerializer(request.user, context={'request': request})
-        return Response(serializer.data)
-    except:
-        return Response({'success': False}, status=status.HTTP_401_UNAUTHORIZED)
+        if request.method == 'GET':
+            serializer = CustomUserSerializer(request.user, context={'request': request})
+            return Response(serializer.data)
+        else:
+            serializer = CustomUserImageUpdateSerializer(request.user, context={'request': request}, data=request.data)
+            print(request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
@@ -175,6 +184,23 @@ def see_new_messages(request):
         return Response('All messages have been seen successfully')
     except Exception:
         return Response({'message': str(Exception)}, status=status.HTTP_401_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+def update_user(request):
+    user = request.user
+    try:
+        serializer = CustomUserUpdateSerializer(user, context={'request': request}, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            print(request.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception as e:
+        print(e)
+        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 
