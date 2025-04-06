@@ -5,7 +5,8 @@ from user_auth import views
 from user_auth.views import CustomTokenObtainPairView, CustomTokenRefreshView
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
+router.register(r'users', views.UserViewSet, basename='users')
+# router.register(r'credit_cards', views.PaymentCard, basename='credit_cards')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -19,4 +20,6 @@ urlpatterns = [
     path('get_messages', views.get_messages, name='get_messages'),
     path('get_new_messages', views.see_new_messages, name='get_new_messages'),
     path('update_user_data', views.update_user, name='update_user_data'),
+    path('add_card', views.add_card, name='add_card'),
+    path('get_cards', views.get_cards, name='get_cards'),
 ]

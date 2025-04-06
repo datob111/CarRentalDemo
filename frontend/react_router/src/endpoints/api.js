@@ -15,6 +15,8 @@ const deleteReservationUrl = 'http://127.0.0.1:8000/reservations/'
 const getMessagesUrl = `${baseUrl}get_messages`
 const seeNewMEssagesUrl = `${baseUrl}get_new_messages`
 const updateProfilePhotoUrl = `${baseUrl}get_user`
+const addCardURl = `${baseUrl}add_card`
+const getCardsUrl = `${baseUrl}get_cards`
 
 
 export async function Login(email, password){
@@ -231,5 +233,32 @@ export async function updateUserField(pk, fieldkey, field) {
         console.log('refreshed')
         const response = await axios.put(updateUrl, {}, {withCredentials:true})
         return response.data
+    }
+}
+
+
+
+export async function addCard(ccv, expDate, cardNumber, postalCode, cardHolder){
+    try{
+        const response = axios.post(addCardURl, {'ccv': ccv, 'expiry_date': expDate, 'card_number': cardNumber, 'card_holder': cardHolder, 'postal_code': postalCode}, {withCredentials: true})
+        return response
+    }catch(error){
+        await RefreshToken()
+        console.log(error.response.data)
+        console.log('refreshed')
+        return await axios.post(addCardURl, {'ccv': ccv, 'expiry_date': expDate, 'card_number': cardNumber, 'card_holder': cardHolder, 'postal_code': postalCode}, {withCredentials:true})
+    }
+}
+
+
+export async function getCards(){
+    try{
+        const response = axios.get(getCardsUrl, {withCredentials: true})
+        return response
+    }catch(error){
+        await RefreshToken()
+        console.log(error.response.data)
+        console.log('refreshed')
+        return await axios.get(getCardsUrl, {withCredentials:true})
     }
 }

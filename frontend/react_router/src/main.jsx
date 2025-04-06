@@ -9,6 +9,7 @@ import { LocalizationProvider, DateTimePicker, DatePicker } from '@mui/x-date-pi
 import { createTheme, ThemeProvider } from '@mui/system'
 import CarProvider from './contexts/useCar.jsx'
 import MessagesProvider from './contexts/MessagesContext.jsx'
+import CardsProvider from './contexts/CardsContext.jsx'
 
 
 
@@ -38,12 +39,14 @@ createRoot(document.getElementById('root')).render(
 
 <ChakraProvider>
     <BrowserRouter>
-      <AuthProvider>
+    <AuthProvider>
+      <CardsProvider>
         <CarProvider>
           <MessagesProvider>
             <App />
           </MessagesProvider>
         </CarProvider>
+       </CardsProvider>
       </AuthProvider>
       </BrowserRouter>
   </ChakraProvider>

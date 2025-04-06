@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import CustomUser, Payment, Messages
+from .models import CustomUser, Payment, Messages, PaymentCard
 
 
 # Register your models here.
@@ -33,3 +33,4 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Payment)
 admin.site.register(Messages)
+admin.site.register(PaymentCard)

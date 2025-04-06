@@ -6,7 +6,7 @@ import { FaPhone  } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
 import UpdateUserField from "../components/UpdateUserField";
 import ImageUPdateForm from "../components/ImageUpdateForm";
-import CreditCard from "../components/CreditCards";
+import CreditCardSection from "../components/CreditCardSection";
 
 
 export default function Profile(){
@@ -34,7 +34,7 @@ export default function Profile(){
                     </div>
                 </div>
                    }
-                   <CreditCard/>
+                   <CreditCardSection/>
         </div>
 
         <div>

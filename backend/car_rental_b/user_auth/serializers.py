@@ -2,7 +2,7 @@ from django.utils import timezone
 
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
-from .models import CustomUser, Payment, Messages
+from .models import CustomUser, Payment, Messages, PaymentCard
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -84,3 +84,24 @@ class MessageSerializer(serializers.ModelSerializer):
     def get_date(self, obj):
         local_time = timezone.localtime(obj.date)
         return local_time.strftime('%Y-%m-%d %H:%M')
+
+
+class PaymentCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentCard
+        fields = ('id', 'ccv', 'card_number', 'postal_code', 'card_holder', 'expiry_date')
+
+    def validate_ccv(self, value):
+        if value < 0 or len(str(value)) != 3:
+            raise serializers.ValidationError("Invalid CCV")
+        return value
+
+    def validate_card_number(self, value):
+        if value < 0 or len(str(value)) != 16:
+            raise serializers.ValidationError("Invalid Card Number")
+        return value
+
+    def validate_postal_code(self, value):
+        if value < 0 or len(str(value)) != 4:
+            raise serializers.ValidationError("Invalid Postal Code")
+        return value

@@ -1,5 +1,6 @@
 import json
-
+from django.utils import timezone
+import datetime
 from django.shortcuts import render
 from rest_framework import status
 
@@ -10,8 +11,9 @@ from rest_framework.authentication import BasicAuthentication, SessionAuthentica
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from .models import CustomUser, Payment, Messages
-from .serializers import CustomUserSerializer, PaymentSerializer, MessageSerializer, CustomUserImageUpdateSerializer, CustomUserUpdateSerializer
+from .models import CustomUser, Payment, Messages, PaymentCard
+from .serializers import CustomUserSerializer, PaymentSerializer, MessageSerializer, CustomUserImageUpdateSerializer, \
+    CustomUserUpdateSerializer, PaymentCardSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 # Create your views here.
@@ -24,7 +26,6 @@ class UserViewSet(ModelViewSet):
     serializer_class = CustomUserSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         try:
@@ -203,6 +204,31 @@ def update_user(request):
         return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_card(request):
+    try:
+        serializer = PaymentCardSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            # serializer.data.update({'user': request.user, 'expiry_date': datetime.date.today()})
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(e)
+        print(type(request.data['expiry_date']))
+        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_cards(request):
+    try:
+        all_cards = PaymentCard.objects.filter(user=request.user)
+        serializer = PaymentCardSerializer(all_cards, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        print(e)
+        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 

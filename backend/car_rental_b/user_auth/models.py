@@ -64,3 +64,12 @@ class Messages(models.Model):
     type = models.CharField(max_length=15, choices=types)
 
 
+class PaymentCard(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='payment_cards')
+    card_number = models.IntegerField(null=False)
+    expiry_date = models.DateField()
+    ccv = models.IntegerField()
+    card_holder = models.CharField(max_length=35, null=False)
+    postal_code = models.IntegerField()
+
+

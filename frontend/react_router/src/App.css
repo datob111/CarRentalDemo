@@ -2,7 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-
+.crediCard:hover {
+  transform: rotateY(-180deg);
+  border-radius: 40px;
+}
 
 #root {
   width: 100%;

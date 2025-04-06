@@ -5,12 +5,13 @@ import { useCar } from "../contexts/useCar"
 import { useEffect } from "react"
 import LocationsProvider from "../contexts/LocationsContext"
 import MapBoxMap from "../components/MapBoxMap"
+import { useCards } from "../contexts/CardsContext"
 
 
 export default function CarReservation(){
 
     // useEffect(()=>{console.log(cars)}, [])
-
+    const {cards} = useCards()
     const {carId} = useParams()
     const location = useLocation()
     const {cars} = useCar()
@@ -22,7 +23,7 @@ export default function CarReservation(){
             console.log(error)
         }
 
-    let InfoContainer
+    let InfoContainer;
     try{
         InfoContainer = (
             <div className="flex flex-col">

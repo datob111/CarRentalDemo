@@ -6,6 +6,8 @@ import { LocationsContext } from '../contexts/LocationsContext'
 import MapBoxMap from './MapBoxMap'
 // import ReactMapGl, {Marker} from 'react-map-gl'
 import { useMessages } from '../contexts/MessagesContext'
+import CreditCard from './CreditCard'
+import { useCards } from '../contexts/CardsContext'
 
 
 // import { LocalizationProvider } from '@mui/x-date-pickers'
@@ -26,6 +28,9 @@ import AddressField from './AddressField'
 
 
 export default function ReservationForm1({carId}){
+	const {cards} = useCards()
+	const [changeCard, setChangeCard] = useState(false)
+	const [currentCard, setCurrentCard] = useState(cards[0])
 	
 	const [currentTime, setCurrentTime] = useState(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
 	const [pickUpDate, setPickUpDate] = useState(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16))
@@ -227,11 +232,24 @@ export default function ReservationForm1({carId}){
 
 
 	return (
-            <div className="bg-gray-800 p-8 rounded-xl shadow-[5px_5px_17px_1px] shadow-gray-800  max-w-lg w-full">
+            <div className="relative bg-gray-800 p-8 rounded-xl shadow-[5px_5px_17px_1px] shadow-gray-800  max-w-lg w-full">
                 <h2 className="text-center text-3xl font-semibold text-gray-200 mb-6">Book a Car</h2>
                 <form onSubmit={handleReservation} className="space-y-4">
 				<AddressField label={"Pickup Location"} setLocation = {setPickUpLocation}/>
 				<AddressField label={"DropOff Location"} setLocation = {setDropOffLocation}/>
+				{changeCard && (
+					<div className='absolute inset-0 px-8 top-36'>
+					<div className='bg-slate-400 px-4 py-3 flex flex-col gap-4 rounded-md overflow-y-scroll no-scrollbar h-[300px]'>
+							{cards.map(card=>{
+								return <div key={card.id} onClick={()=>{setCurrentCard(card), setChangeCard(false)}} >
+									<CreditCard cardNumber={card.card_number}/>
+								</div>
+								
+							})}
+						</div>
+				</div>
+				)}
+				
                     <div>
                         <label className="block text-sm text-gray-200 mb-2">Pickup Date</label>
                         <input type="datetime-local" className="w-full p-3 rounded-md bg-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-white" min={new Date(currentTime).toISOString().slice(0, 16)} value={pickUpDate} onChange={handlePickUp} required />
@@ -242,6 +260,11 @@ export default function ReservationForm1({carId}){
                     </div>
 					{(timerLeft>0 && timeToBook<=0)&& <p className={timer.hours>=1? 'text-green-700': 'text-orange-600'}>{timer.hours}:{timer.minutes}:{timer.seconds}</p>}
 					{timeToBook>0 && <p className='text-slate-100 font-bold'>The reservation will be active in {bookTimer.hours}:{bookTimer.minutes}: {bookTimer.seconds}</p>}
+					<div className='flex justify-between'>
+						<CreditCard cardNumber={currentCard.card_number}/>
+						<div></div>
+						<button onClick={()=>{setChangeCard(true)}} type='button' className='text-white text-lg font-bold focus-within:outline-none'>Change a card</button>
+					</div>
                     <button type="submit" className="w-full p-3 mt-4 bg-slate-300 text-amber-600 text-xl font-bold rounded-md focus:outline-none 
 					hover:bg-amber-600 hover:text-slate-300 hover:outline-none transition focus:ring-offset-0 ">Book Now</button>
                     {message && <p className={`text-center ${message.color} mt-4 text-lg`}>{message.text}</p>}
